@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gufo-dao
+package gufodao
 
 import (
 	"fmt"
@@ -22,6 +22,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+
 	// import _ "github.com/jinzhu/gorm/dialects/sqlite"
 	// import _ "github.com/jinzhu/gorm/dialects/mssql"
 	viper "github.com/spf13/viper"

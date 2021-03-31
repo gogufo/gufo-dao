@@ -1,4 +1,4 @@
-module github.com/gogufo/gufo-dao
+module github.com/gogufo/gufodao
 
 go 1.16
 

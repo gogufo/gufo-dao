@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-package gufo-dao
+package gufodao
 
 import (
 	"fmt"
