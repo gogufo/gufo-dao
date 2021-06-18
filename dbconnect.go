@@ -44,12 +44,13 @@ func DBConnect() (*DB, error) {
 	dbname := viper.GetString("database.dbname")
 	host := viper.GetString("database.host")
 	port := viper.GetString("database.port")
+	charset := viper.GetString("database.charset")
 
 	var request string
 
 	switch dbtype {
 	case "mysql":
-		request = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", user, pass, host, port, dbname)
+		request = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true", user, pass, host, port, dbname, charset)
 	case "postgres":
 		request = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", host, port, user, dbname, pass)
 	}
@@ -85,12 +86,12 @@ func ConnectDB() (*DB, error) {
 
 // CloseConnection close connection db
 func CloseConnection(db *DB) {
-	/*
-		SetErrorLog("I close db")
 
-		err := db.Conn.Close()
-		if err != nil {
-			SetErrorLog("dbconnect.go:89: " + err.Error())
-		}
-	*/
+	SetErrorLog("I close db")
+
+	err := db.Conn.Close()
+	if err != nil {
+		SetErrorLog("dbconnect.go:89: " + err.Error())
+	}
+
 }
