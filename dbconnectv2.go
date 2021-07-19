@@ -1,4 +1,4 @@
-// Copyright 2020 Alexey Yanchenko <mail@yanchenko.me>
+// Copyright 2021 Alexey Yanchenko <mail@yanchenko.me>
 //
 // This file is part of the Gufo library.
 //
@@ -19,24 +19,25 @@ package gufodao
 import (
 	"fmt"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
-	// import _ "github.com/jinzhu/gorm/dialects/sqlite"
-	// import _ "github.com/jinzhu/gorm/dialects/mssql"
+	//	"gorm.io/driver/sqlite"
 	viper "github.com/spf13/viper"
 )
 
 // DB struct
-type DB struct {
+//Uncomment after remove v1 Librry
+
+type DBv2 struct {
 	Conn *gorm.DB
 }
 
 // Connection instance
-var DBConnection = &DB{}
+var DBConnectionv2 = &DBv2{}
 
-func DBConnect() (*DB, error) {
+func DBConnectv2() (*DBv2, error) {
 	dbtype := viper.GetString("database.type")
 	user := viper.GetString("database.user")
 	pass := viper.GetString("database.password")
@@ -48,18 +49,27 @@ func DBConnect() (*DB, error) {
 
 	var request string
 
+	var err error
+
 	switch dbtype {
 	case "mysql":
 		request = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true", user, pass, host, port, dbname, charset)
+		db, err := gorm.Open(mysql.Open(request), &gorm.Config{})
+		DBConnectionv2.Conn = db
+		return DBConnectionv2, err
 	case "postgres":
 		request = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", host, port, user, dbname, pass)
+		//	dsn := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
+		db, err := gorm.Open(postgres.Open(request), &gorm.Config{})
+		DBConnectionv2.Conn = db
+		return DBConnectionv2, err
+	default:
+		return nil, err
 	}
-	db, err := gorm.Open(dbtype, request)
-	DBConnection.Conn = db
-	return DBConnection, err
 
 }
 
+/*
 func DBCheck() bool {
 	_, err := DBConnect()
 	//defer db.Close()
@@ -70,28 +80,13 @@ func DBCheck() bool {
 		return true
 	}
 }
-
+*/
 // GetConnection - connect to DB
-func ConnectDB() (*DB, error) {
-	db, err := DBConnect()
+func ConnectDBv2() (*DBv2, error) {
+	db, err := DBConnectv2()
 	if err != nil {
 		return db, err
 	}
-	err = db.Conn.DB().Ping()
-	if err != nil {
-		return db, err
-	}
+
 	return db, nil
-}
-
-// CloseConnection close connection db
-func CloseConnection(db *DB) {
-	/*
-		SetErrorLog("I close db")
-
-		err := db.Conn.Close()
-		if err != nil {
-			SetErrorLog("dbconnect.go:89: " + err.Error())
-		}
-	*/
 }

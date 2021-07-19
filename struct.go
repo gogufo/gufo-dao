@@ -32,8 +32,9 @@ type Request struct {
 
 //Error response struct
 type ErrorResponse struct {
-	Success   int                    `json:"success"`
-	Error     string                 `json:"error"`
+	Success int    `json:"success"`
+	Error   string `json:"error"`
+	//	Message   string                 `json:"message"`
 	Session   map[string]interface{} `json:"session"`
 	TimeStamp int                    `json:"timestamp"`
 	Language  string                 `json:"lang"`
