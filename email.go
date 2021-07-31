@@ -37,11 +37,12 @@ type MailRequest struct {
 	file    []string
 }
 
-func NewRequest(to []string, subject, body string) *MailRequest {
+func NewRequest(to []string, subject, body string, attach []string) *MailRequest {
 	return &MailRequest{
 		to:      to,
 		subject: subject,
 		body:    body,
+		file:    attach,
 	}
 }
 
@@ -111,7 +112,7 @@ func (r *MailRequest) ParseTemplate(templateFileName string, data interface{}) e
 	return nil
 }
 
-func SendHTMLEmail(to string, title string, link []string, subject string, templ string) {
+func SendHTMLEmail(to string, title string, link []string, subject string, templ string, attach []string) {
 
 	htmllink := []template.HTML{}
 
@@ -132,13 +133,13 @@ func SendHTMLEmail(to string, title string, link []string, subject string, templ
 	templateDir := viper.GetString("server.tempdir")
 	var emailtemplate = path.Join(templateDir, templ)
 
-	r := NewRequest([]string{to}, subject, "")
+	r := NewRequest([]string{to}, subject, "", attach)
 
 	if err := r.ParseTemplate(emailtemplate, templateData); err == nil {
 		r.SendEmail()
 		//fmt.Println(ok)
 
 	} else {
-		SetErrorLog("email.go:122: " + err.Error())
+		SetErrorLog("email.go:143: " + err.Error())
 	}
 }
