@@ -34,6 +34,7 @@ type MailRequest struct {
 	to      []string
 	subject string
 	body    string
+	file    []string
 }
 
 func NewRequest(to []string, subject, body string) *MailRequest {
@@ -70,6 +71,14 @@ func (r *MailRequest) SendEmail() (bool, error) {
 	mail.SetHeader("X-Mailer", "gufo")
 	mail.SetHeader("Subject", r.subject)
 	mail.SetBody("text/html", r.body)
+
+	if len(r.file) > 0 {
+		for i := 0; i < len(r.file); i++ {
+			mail.Attach(r.file[i])
+		}
+
+	}
+
 	portint, _ := strconv.Atoi(port)
 	// Create an smtp dialer
 	sendMail := gomail.NewDialer(host, portint, user, pass)
