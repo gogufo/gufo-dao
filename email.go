@@ -37,6 +37,17 @@ type MailRequest struct {
 	file    []string
 }
 
+type MailSettings struct {
+	custom  bool
+	host    string
+	port    string
+	user    string
+	pass    string
+	address string
+	reply   string
+	title   string
+}
+
 func NewRequest(to []string, subject, body string, attach []string) *MailRequest {
 	return &MailRequest{
 		to:      to,
@@ -46,7 +57,7 @@ func NewRequest(to []string, subject, body string, attach []string) *MailRequest
 	}
 }
 
-func (r *MailRequest) SendEmail() (bool, error) {
+func (r *MailRequest) SendEmail(ms *MailSettings) (bool, error) {
 
 	host := viper.GetString("email.host")
 	port := viper.GetString("email.port")
@@ -54,8 +65,17 @@ func (r *MailRequest) SendEmail() (bool, error) {
 	pass := GetPass("email.password")
 	address := viper.GetString("email.address")
 	reply := viper.GetString("email.reply")
-	//addr := fmt.Sprintf("%s:%s", host, port)
 	fromuser := viper.GetString("email.title")
+
+	if ms.custom {
+		host = ms.host
+		port = ms.port
+		user = ms.user
+		pass = ms.pass
+		address = ms.address
+		reply = ms.reply
+		fromuser = ms.title
+	}
 
 	//xm := "X-Mailer: gufo; \r\n"
 	//mime := "MIME-version: 1.0;\r\nContent-Type: text/html;charset=\"UTF-8\";\r\n\r\n"
@@ -112,7 +132,7 @@ func (r *MailRequest) ParseTemplate(templateFileName string, data interface{}) e
 	return nil
 }
 
-func SendHTMLEmail(to string, title string, link []string, subject string, templ string, attach []string) {
+func SendHTMLEmail(to string, title string, link []string, subject string, templ string, attach []string, ms *MailSettings) {
 
 	htmllink := []template.HTML{}
 
@@ -136,7 +156,7 @@ func SendHTMLEmail(to string, title string, link []string, subject string, templ
 	r := NewRequest([]string{to}, subject, "", attach)
 
 	if err := r.ParseTemplate(emailtemplate, templateData); err == nil {
-		r.SendEmail()
+		r.SendEmail(ms)
 		//fmt.Println(ok)
 
 	} else {
