@@ -38,14 +38,14 @@ type MailRequest struct {
 }
 
 type MailSettings struct {
-	custom  bool
-	host    string
-	port    string
-	user    string
-	pass    string
-	address string
-	reply   string
-	title   string
+	Custom  bool
+	Host    string
+	Port    string
+	User    string
+	Pass    string
+	Address string
+	Reply   string
+	Title   string
 }
 
 func NewRequest(to []string, subject, body string, attach []string) *MailRequest {
@@ -67,14 +67,14 @@ func (r *MailRequest) SendEmail(ms *MailSettings) (bool, error) {
 	reply := viper.GetString("email.reply")
 	fromuser := viper.GetString("email.title")
 
-	if ms.custom {
-		host = ms.host
-		port = ms.port
-		user = ms.user
-		pass = ms.pass
-		address = ms.address
-		reply = ms.reply
-		fromuser = ms.title
+	if ms.Custom {
+		host = ms.Host
+		port = ms.Port
+		user = ms.User
+		pass = ms.Pass
+		address = ms.Address
+		reply = ms.Reply
+		fromuser = ms.Title
 	}
 
 	//xm := "X-Mailer: gufo; \r\n"
