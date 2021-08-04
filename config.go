@@ -110,6 +110,16 @@ func DecryptConfigPasswords(pwd string) string {
 	}
 }
 
+func EncryptConfigPassword(pwd string) (string, error) {
+	encryptMsg, err := encrypt(pwd)
+	if err != nil {
+		return "", err
+	}
+	newpasswordrecord := "$2a##" + encryptMsg
+	return newpasswordrecord, nil
+
+}
+
 func ConfigString(conf string) string {
 
 	viper.SetConfigName(configname) // name of config file (without extension)

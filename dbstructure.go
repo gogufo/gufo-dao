@@ -39,6 +39,7 @@ type Users struct {
 	Status        int    `gorm:"type:double;DEFAULT 'false'"`
 	Completed     int    `gorm:"type:double;DEFAULT 'false'"`
 	IsAdmin       int    `gorm:"type:double;DEFAULT 'false'"`
+	Readonly      int    `gorm:"type:double;DEFAULT 'false'"`
 }
 
 /*
