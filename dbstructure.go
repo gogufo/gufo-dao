@@ -27,19 +27,19 @@ import (
 
 type Users struct {
 	gorm.Model
-	UID           string `gorm:"type:varchar(60);UNIQUE;NOT NULL;"`
-	Name          string `gorm:"type:varchar(60);NOT NULL;DEFAULT '';UNIQUE"`
-	Pass          string `gorm:"type:varchar(128);NOT NULL;DEFAULT ''"`
-	Mail          string `gorm:"type:varchar(254);DEFAULT '';UNIQUE"`
-	Mailsent      int    `gorm:"type:int(11);DEFAULT '0'"`
-	Mailconfirmed int    `gorm:"type:int(11);DEFAULT '0'"`
-	Created       int    `gorm:"type:int(11);DEFAULT '0'"`
-	Access        int    `gorm:"type:int(11);DEFAULT '0'"`
-	Login         int    `gorm:"type:int(11);DEFAULT '0'"`
-	Status        int    `gorm:"type:double;DEFAULT 'false'"`
-	Completed     int    `gorm:"type:double;DEFAULT 'false'"`
-	IsAdmin       int    `gorm:"type:double;DEFAULT 'false'"`
-	Readonly      int    `gorm:"type:double;DEFAULT 'false'"`
+	UID           string `gorm:"column:uid;type:varchar(60);UNIQUE;NOT NULL;"`
+	Name          string `gorm:"column:name;type:varchar(60);NOT NULL;DEFAULT '';UNIQUE"`
+	Pass          string `gorm:"column:pass;type:varchar(128);NOT NULL;DEFAULT ''"`
+	Mail          string `gorm:"column:mail;type:varchar(254);DEFAULT '';UNIQUE"`
+	Mailsent      int    `gorm:"column:mailsent;type:int(11);DEFAULT '0'"`
+	Mailconfirmed int    `gorm:"column:mailconfirmed;:int(11);DEFAULT '0'"`
+	Created       int    `gorm:"column:created;type:int(11);DEFAULT '0'"`
+	Access        int    `gorm:"column:access;type:int(11);DEFAULT '0'"`
+	Login         int    `gorm:"column:login;type:int(11);DEFAULT '0'"`
+	Status        int    `gorm:"column:status;type:double;DEFAULT 'false'"`
+	Completed     int    `gorm:"column:completed;type:double;DEFAULT 'false'"`
+	IsAdmin       int    `gorm:"column:is_admin;type:double;DEFAULT 'false'"`
+	Readonly      int    `gorm:"column:readonly;type:double;DEFAULT 'false'"`
 }
 
 /*
@@ -67,12 +67,12 @@ livetime - hash life time
 */
 type TimeHash struct {
 	gorm.Model
-	UID      string `gorm:"type:varchar(60);NOT NULL;"`
-	Mail     string `gorm:"type:varchar(254);DEFAULT '';"`
-	Hash     string `gorm:"type:varchar(254);DEFAULT '';"`
-	Param    string `gorm:"type:varchar(254);DEFAULT '';"`
-	Created  int    `gorm:"type:int(11);DEFAULT '0'"`
-	Livetime int    `gorm:"type:int(11);DEFAULT '0'"`
+	UID      string `gorm:"column:uid;type:varchar(60);NOT NULL;"`
+	Mail     string `gorm:"column:mail;type:varchar(254);DEFAULT '';"`
+	Hash     string `gorm:"column:hash;type:varchar(254);DEFAULT '';"`
+	Param    string `gorm:"column:param;type:varchar(254);DEFAULT '';"`
+	Created  int    `gorm:"column:created;type:int(11);DEFAULT '0'"`
+	Livetime int    `gorm:"column:livetime;type:int(11);DEFAULT '0'"`
 }
 
 func CheckDBStructure() {
