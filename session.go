@@ -138,7 +138,7 @@ func WriteTokenInRedis(sessionToken string, uid string, isadmin int, completed i
 		SetErrorLog("session.go:128: " + err.Error())
 	}
 
-	_, err = conn.Do("HMSET", sessionToken, "expired", exptime, "uid", uid, "isadmin", isadmin, "completed", completed, readonly) //commandName , ARG1, ARG2, ARG3
+	_, err = conn.Do("HMSET", sessionToken, "expired", exptime, "uid", uid, "isadmin", isadmin, "completed", completed, "readonly", readonly) //commandName , ARG1, ARG2, ARG3
 	if err != nil {
 		// If there is an error in setting the cache, return an internal server error
 
