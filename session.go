@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func SetSession(name string, isAdmin int, completed int) (sessionToken string, exptime int, err error) {
+func SetSession(name string, isAdmin int, completed int, readonly int) (sessionToken string, exptime int, err error) {
 	// Create a new random session token
 
 	// Create a new token object, specifying signing method and the claims
@@ -44,7 +44,7 @@ func SetSession(name string, isAdmin int, completed int) (sessionToken string, e
 
 	// Set the token in the cache, along with the user whom it represents
 	// The token has an expiry time of 120 seconds
-	WriteTokenInRedis(sessionToken, name, isAdmin, completed, exptime)
+	WriteTokenInRedis(sessionToken, name, isAdmin, completed, exptime, readonly)
 	return sessionToken, exptime, err
 }
 
@@ -59,7 +59,7 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 		SetErrorLog("session.go:59 " + err.Error())
 	}
 
-	response, err := redis.Values(conn.Do("HMGET", sessionToken, "expired", "uid", "isadmin", "completed")) //commandName , ARG1, ARG2, ARG3
+	response, err := redis.Values(conn.Do("HMGET", sessionToken, "expired", "uid", "isadmin", "completed", "readonly")) //commandName , ARG1, ARG2, ARG3
 	if err != nil {
 		// If there is an error in setting the cache, return an internal server error
 
@@ -69,8 +69,9 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 	var uid string
 	var isadmin int
 	var completed int
+	var readonly int
 
-	if _, err := redis.Scan(response, &exptime, &uid, &isadmin, &completed); err != nil {
+	if _, err := redis.Scan(response, &exptime, &uid, &isadmin, &completed, &readonly); err != nil {
 		// handle error
 		SetErrorLog("session.go:70: " + err.Error())
 	}
@@ -83,12 +84,13 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 
 	//updates session
 	newexptime := int(time.Now().Unix()) + viper.GetInt("token.expiretime")
-	WriteTokenInRedis(sessionToken, uid, isadmin, completed, newexptime)
+	WriteTokenInRedis(sessionToken, uid, isadmin, completed, newexptime, readonly)
 
 	ans["uid"] = uid
 	ans["isadmin"] = isadmin
 	ans["session_expired"] = newexptime
 	ans["completed"] = completed
+	ans["readonly"] = readonly
 	return ans
 
 }
@@ -128,7 +130,7 @@ func DelSession(sessionToken string) {
 	}
 }
 
-func WriteTokenInRedis(sessionToken string, uid string, isadmin int, completed int, exptime int) {
+func WriteTokenInRedis(sessionToken string, uid string, isadmin int, completed int, exptime int, readonly int) {
 
 	n := ConfigString("redis.host")
 	conn, err := redis.DialURL(n)
@@ -136,7 +138,7 @@ func WriteTokenInRedis(sessionToken string, uid string, isadmin int, completed i
 		SetErrorLog("session.go:128: " + err.Error())
 	}
 
-	_, err = conn.Do("HMSET", sessionToken, "expired", exptime, "uid", uid, "isadmin", isadmin, "completed", completed) //commandName , ARG1, ARG2, ARG3
+	_, err = conn.Do("HMSET", sessionToken, "expired", exptime, "uid", uid, "isadmin", isadmin, "completed", completed, readonly) //commandName , ARG1, ARG2, ARG3
 	if err != nil {
 		// If there is an error in setting the cache, return an internal server error
 

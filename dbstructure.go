@@ -134,6 +134,17 @@ func CheckDBStructure() {
 		//db.Conn.Create(&role)
 
 		ans := fmt.Sprintf("Admin User created!\t\nname: admin\t\npass: %s\t\nemail: %s \t\n", userpass, useremail)
+
+		//Check for email settings
+		if viper.GetString("email.address") != "" {
+			//Send email with password
+			str := fmt.Sprintf("Your Gufo admin account was created with password: %v", userpass)
+			linkarray := []string{str}
+			ms := &MailSettings{}
+			ms.Custom = false
+			go SendHTMLEmail(user.Mail, "Hi, admin", linkarray, "New account", "email.html", nil, ms)
+		}
+
 		fmt.Printf(ans)
 
 	}
