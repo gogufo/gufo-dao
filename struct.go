@@ -31,11 +31,15 @@ type Request struct {
 	Readonly   int
 }
 
+type ErrorMsg struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
 //Error response struct
 type ErrorResponse struct {
-	Success int `json:"success"`
-	//Error     string                 `json:"error"`
-	Error     map[string]interface{} `json:"error"`
+	Success   int                    `json:"success"`
+	Error     []ErrorMsg             `json:"error"`
 	Session   map[string]interface{} `json:"session"`
 	TimeStamp int                    `json:"timestamp"`
 	Language  string                 `json:"lang"`
