@@ -77,25 +77,24 @@ type TimeHash struct {
 
 func CheckDBStructure() {
 	//Check DB and table config
-	db, err := ConnectDB()
+	db, err := ConnectDBv2()
 	if err != nil {
 		SetErrorLog("dbstructure.go:81: " + err.Error())
 		//return "error with db"
 	}
 
-	defer CloseConnection(db)
 	/*
-		if !db.Conn.HasTable(&Roles{}) {
+		if !db.Conn.Migrator().HasTable(&Roles{}) {
 			//Create roles table
-			db.Conn.Set("gorm:table_options", "ENGINE=InnoDB;").CreateTable(&Roles{})
+			db.Conn.Set("gorm:table_options", "ENGINE=InnoDB;").Migrator().CreateTable(&Roles{})
 		}
 	*/
 	//Check if table users and roles exist
-	if !db.Conn.HasTable(&Users{}) {
+	if !db.Conn.Migrator().HasTable(&Users{}) {
 		SetErrorLog("dbstructure.go:94: " + "Table users do not exist. Create table Users")
 		//db.Conn.Debug().AutoMigrate(&Users{})
 		//Create users table
-		db.Conn.Set("gorm:table_options", "ENGINE=InnoDB;").CreateTable(&Users{})
+		db.Conn.Set("gorm:table_options", "ENGINE=InnoDB;").Migrator().CreateTable(&Users{})
 
 		//Add admin user
 		//1. generate user hash
@@ -150,13 +149,13 @@ func CheckDBStructure() {
 	}
 
 	//Create timehash table
-	if !db.Conn.HasTable(&TimeHash{}) {
-		db.Conn.Set("gorm:table_options", "ENGINE=InnoDB;").CreateTable(&TimeHash{})
+	if !db.Conn.Migrator().HasTable(&TimeHash{}) {
+		db.Conn.Set("gorm:table_options", "ENGINE=InnoDB;").Migrator().CreateTable(&TimeHash{})
 	}
 	/*
-		if !db.Conn.HasTable(&Settings{}) {
+		if !db.Conn.Migrator().HasTable(&Settings{}) {
 			//Create settings table
-			db.Conn.Set("gorm:table_options", "ENGINE=InnoDB;").CreateTable(&Settings{})
+			db.Conn.Set("gorm:table_options", "ENGINE=InnoDB;").Migrator().CreateTable(&Settings{})
 			setting := Settings{
 				Email_Confirmation: false,
 				Registration:       true,

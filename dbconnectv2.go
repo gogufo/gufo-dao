@@ -88,5 +88,16 @@ func ConnectDBv2() (*DBv2, error) {
 		return db, err
 	}
 
+	sqlDB, err := db.Conn.DB()
+	if err != nil {
+		return db, err
+	}
+
+	dbcon := viper.GetInt("database.connectionssize")
+	dbpool := viper.GetInt("database.poolsize")
+
+	sqlDB.SetMaxIdleConns(dbcon)
+	sqlDB.SetMaxOpenConns(dbpool)
+
 	return db, nil
 }

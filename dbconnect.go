@@ -83,15 +83,3 @@ func ConnectDB() (*DB, error) {
 	}
 	return db, nil
 }
-
-// CloseConnection close connection db
-func CloseConnection(db *DB) {
-	/*
-		SetErrorLog("I close db")
-
-		err := db.Conn.Close()
-		if err != nil {
-			SetErrorLog("dbconnect.go:89: " + err.Error())
-		}
-	*/
-}
