@@ -17,8 +17,10 @@ package gufodao
 
 // Request struct
 type Request struct {
-	Module     string            `json:"module"`
-	Param      string            `json:"param"`
+	Module     string
+	Param      string
+	ParamID    string
+	Action     string
 	Args       map[string]string `json:"args"`
 	Token      string
 	TimeStamp  int    `json:"timestamp"`
