@@ -6,7 +6,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@ type Request struct {
 	Action     string
 	Args       map[string]string `json:"args"`
 	Token      string
+	TokenType  string
 	TimeStamp  int    `json:"timestamp"`
 	Language   string `json:"lang"`
 	Dbversion  string
@@ -38,7 +39,7 @@ type ErrorMsg struct {
 	Message string `json:"message"`
 }
 
-//Error response struct
+// Error response struct
 type ErrorResponse struct {
 	Success   int                    `json:"success"`
 	Error     []ErrorMsg             `json:"error"`
@@ -52,7 +53,7 @@ type ErrorResponse struct {
 	*/
 }
 
-//Succsess response struct
+// Succsess response struct
 type SuccessResponse struct {
 	Success   int                    `json:"success"`
 	Data      map[string]interface{} `json:"data"`

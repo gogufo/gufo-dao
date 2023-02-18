@@ -19,9 +19,11 @@ package gufodao
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/getsentry/sentry-go"
 	"github.com/gomodule/redigo/redis"
 	"github.com/spf13/viper"
 )
@@ -50,16 +52,21 @@ func SetSession(name string, isAdmin int, completed int, readonly int) (sessionT
 
 func UpdateSession(sessionToken string) map[string]interface{} {
 
+	tokenarray := strings.Split(sessionToken, " ")
+	tokentype := tokenarray[0]
+	token := tokenarray[1]
+
 	//Get sesssion token
 	ans := make(map[string]interface{})
 
+	// Check Session in Redis
 	n := ConfigString("redis.host")
 	conn, err := redis.DialURL(n)
 	if err != nil {
 		SetErrorLog("session.go:59 " + err.Error())
 	}
 
-	response, err := redis.Values(conn.Do("HMGET", sessionToken, "expired", "uid", "isadmin", "completed", "readonly")) //commandName , ARG1, ARG2, ARG3
+	response, err := redis.Values(conn.Do("HMGET", token, "expired", "uid", "isadmin", "completed", "readonly")) //commandName , ARG1, ARG2, ARG3
 	if err != nil {
 		// If there is an error in setting the cache, return an internal server error
 
@@ -77,20 +84,73 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 	}
 
 	if uid == "" {
-		SetErrorLog("No uid")
-		ans["error"] = "000011" // you are not authorised
-		return ans
+		//Check Session in DB
+
+		//Check DB and table config
+		db, err := sf.ConnectDBv2()
+		if err != nil {
+			if viper.GetBool("server.sentry") {
+				sentry.CaptureException(err)
+			} else {
+				sf.SetErrorLog(err.Error())
+			}
+			ans["httpcode"] = 500
+			errormsg := []sf.ErrorMsg{}
+			errorans := sf.ErrorMsg{
+				Code:    "000027",
+				Message: err.Error(),
+			}
+			errormsg = append(errormsg, errorans)
+			return ans, errormsg, t
+		}
+
+		if tokentype == "APP" {
+			tokentable := APITokens{}
+
+			rows := db.Conn.Debug().Where(`token = ?`, token).First(&tokentable)
+
+			if rows.RowsAffected == 0 || tokentable.Status == 0 || tokentable.Expiration < time.Now().Unix() {
+				SetErrorLog("No uid")
+				ans["error"] = "000011" // you are not authorised
+				return ans
+			}
+
+			// Check Doues User is Admin in case of Token Admin Satatus
+			if tokentable.IsAdmin == 1 {
+				userExist := Users{}
+
+				db.Conn.Debug().Where(`uid = ?`, tokentable.UID).First(&userExist)
+
+				isadmin = userExist.IsAdmin
+			}
+
+			exptime = tokentable.Expiration
+			uid = tokentable.UID
+			completed = 1
+			readonly = tokentable.Readonly
+
+			//Write session into Redis
+			WriteTokenInRedis(token, uid, isadmin, completed, exptime, readonly)
+
+		} else {
+			SetErrorLog("No uid")
+			ans["error"] = "000011" // you are not authorised
+			return ans
+		}
+
 	}
 
 	//updates session
 	newexptime := int(time.Now().Unix()) + viper.GetInt("token.expiretime")
-	WriteTokenInRedis(sessionToken, uid, isadmin, completed, newexptime, readonly)
+	WriteTokenInRedis(token, uid, isadmin, completed, newexptime, readonly)
 
 	ans["uid"] = uid
 	ans["isadmin"] = isadmin
 	ans["session_expired"] = newexptime
 	ans["completed"] = completed
 	ans["readonly"] = readonly
+	ans["token"] = token
+	ans["token_type"] = tokentype
 	return ans
 
 }
