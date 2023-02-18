@@ -121,7 +121,7 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 			uid = tokentable.UID
 			completed = 1
 			readonly = tokentable.Readonly
-			redisexptime = int(time.Now().Unix()) + viper.GetInt("token.expiretime")
+			redisexptime := int(time.Now().Unix()) + viper.GetInt("token.expiretime")
 
 			//Write session into Redis
 			WriteTokenInRedis(token, uid, isadmin, completed, redisexptime, readonly)
