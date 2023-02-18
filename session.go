@@ -87,21 +87,14 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 		//Check Session in DB
 
 		//Check DB and table config
-		db, err := sf.ConnectDBv2()
+		db, err := ConnectDBv2()
 		if err != nil {
 			if viper.GetBool("server.sentry") {
 				sentry.CaptureException(err)
 			} else {
-				sf.SetErrorLog(err.Error())
+				SetErrorLog(err.Error())
 			}
-			ans["httpcode"] = 500
-			errormsg := []sf.ErrorMsg{}
-			errorans := sf.ErrorMsg{
-				Code:    "000027",
-				Message: err.Error(),
-			}
-			errormsg = append(errormsg, errorans)
-			return ans, errormsg, t
+
 		}
 
 		if tokentype == "APP" {
@@ -109,7 +102,7 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 
 			rows := db.Conn.Debug().Where(`token = ?`, token).First(&tokentable)
 
-			if rows.RowsAffected == 0 || tokentable.Status == 0 || tokentable.Expiration < time.Now().Unix() {
+			if rows.RowsAffected == 0 || tokentable.Status == 0 || int64(tokentable.Expiration) < time.Now().Unix() {
 				SetErrorLog("No uid")
 				ans["error"] = "000011" // you are not authorised
 				return ans
@@ -128,9 +121,10 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 			uid = tokentable.UID
 			completed = 1
 			readonly = tokentable.Readonly
+			redisexptime = int(time.Now().Unix()) + viper.GetInt("token.expiretime")
 
 			//Write session into Redis
-			WriteTokenInRedis(token, uid, isadmin, completed, exptime, readonly)
+			WriteTokenInRedis(token, uid, isadmin, completed, redisexptime, readonly)
 
 		} else {
 			SetErrorLog("No uid")
