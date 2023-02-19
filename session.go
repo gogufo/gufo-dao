@@ -102,7 +102,13 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 
 			rows := db.Conn.Debug().Where(`token = ?`, token).First(&tokentable)
 
-			if rows.RowsAffected == 0 || tokentable.Status == 0 || int64(tokentable.Expiration) < time.Now().Unix() {
+			if rows.RowsAffected == 0 || tokentable.Status == 0 {
+				SetErrorLog("No uid")
+				ans["error"] = "000011" // you are not authorised
+				return ans
+			}
+
+			if tokentable.Expiration != "" && int64(tokentable.Expiration) < time.Now().Unix() {
 				SetErrorLog("No uid")
 				ans["error"] = "000011" // you are not authorised
 				return ans
