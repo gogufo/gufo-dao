@@ -108,7 +108,7 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 				return ans
 			}
 
-			if tokentable.Expiration != "" && int64(tokentable.Expiration) < time.Now().Unix() {
+			if tokentable.Expiration != 0 && int64(tokentable.Expiration) < time.Now().Unix() {
 				SetErrorLog("No uid")
 				ans["error"] = "000011" // you are not authorised
 				return ans
