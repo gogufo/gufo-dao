@@ -183,7 +183,7 @@ func DelSession(sessionToken string) {
 		return
 	}
 
-	_, err = cache.Do("DEL", sessionToken)
+	_, err = conn.Do("DEL", sessionToken)
 	if err != nil {
 
 		return
