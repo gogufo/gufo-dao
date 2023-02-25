@@ -101,7 +101,7 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 			tokentable := APITokens{}
 			impersonatetable := ImpersonateTokens{}
 
-			rows = db.Conn.Debug().Where(`token = ?`, token).First(&tokentable)
+			rows := db.Conn.Debug().Where(`token = ?`, token).First(&tokentable)
 
 			if rows.RowsAffected == 0 {
 				//Check impersonate token
