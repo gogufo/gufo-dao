@@ -56,6 +56,15 @@ type APITokens struct {
 	Comment    string `gorm:"column:comment;type:varchar(60);DEFAULT '';"`
 }
 
+type ImpersonateTokens struct {
+	gorm.Model
+	TokenId   string `gorm:"column:tokenid;type:varchar(60);UNIQUE;NOT NULL;"`
+	Token     string `gorm:"column:token;type:varchar(254);UNIQUE;NOT NULL;"`
+	UID       string `gorm:"column:uid;type:varchar(60);NOT NULL;"`
+	Created   int    `gorm:"column:created;type:int(11);DEFAULT '0'"`
+	CreatedBy string `gorm:"column:createdby;type:varchar(254);DEFAULT '';"`
+}
+
 /*
 type Roles struct {
 	gorm.Model

@@ -99,39 +99,59 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 
 		if tokentype == "APP" {
 			tokentable := APITokens{}
+			impersonatetable := ImpersonateTokens{}
 
-			rows := db.Conn.Debug().Where(`token = ?`, token).First(&tokentable)
+			rows = db.Conn.Debug().Where(`token = ?`, token).First(&tokentable)
 
-			if rows.RowsAffected == 0 || tokentable.Status == 0 {
-				SetErrorLog("No uid")
-				ans["error"] = "000011" // you are not authorised
-				return ans
+			if rows.RowsAffected == 0 {
+				//Check impersonate token
+				rowss := db.Conn.Debug().Where(`token = ?`, token).First(&impersonatetable)
+				if rowss.RowsAffected == 0 {
+					SetErrorLog("No uid")
+					ans["error"] = "000011" // you are not authorised
+					return ans
+				}
+
+				uid = impersonatetable.UID
+				completed = 1
+				readonly = 0
+				redisexptime := int(time.Now().Unix()) + viper.GetInt("token.expiretime")
+
+				//Write session into Redis
+				WriteTokenInRedis(token, uid, isadmin, completed, redisexptime, readonly)
+
+			} else {
+
+				if tokentable.Status == 0 {
+					SetErrorLog("No uid")
+					ans["error"] = "000011" // you are not authorised
+					return ans
+				}
+
+				if tokentable.Expiration != 0 && int64(tokentable.Expiration) < time.Now().Unix() {
+					SetErrorLog("No uid")
+					ans["error"] = "000011" // you are not authorised
+					return ans
+				}
+
+				// Check Doues User is Admin in case of Token Admin Satatus
+				if tokentable.IsAdmin == 1 {
+					userExist := Users{}
+
+					db.Conn.Debug().Where(`uid = ?`, tokentable.UID).First(&userExist)
+
+					isadmin = userExist.IsAdmin
+				}
+
+				exptime = tokentable.Expiration
+				uid = tokentable.UID
+				completed = 1
+				readonly = tokentable.Readonly
+				redisexptime := int(time.Now().Unix()) + viper.GetInt("token.expiretime")
+
+				//Write session into Redis
+				WriteTokenInRedis(token, uid, isadmin, completed, redisexptime, readonly)
 			}
-
-			if tokentable.Expiration != 0 && int64(tokentable.Expiration) < time.Now().Unix() {
-				SetErrorLog("No uid")
-				ans["error"] = "000011" // you are not authorised
-				return ans
-			}
-
-			// Check Doues User is Admin in case of Token Admin Satatus
-			if tokentable.IsAdmin == 1 {
-				userExist := Users{}
-
-				db.Conn.Debug().Where(`uid = ?`, tokentable.UID).First(&userExist)
-
-				isadmin = userExist.IsAdmin
-			}
-
-			exptime = tokentable.Expiration
-			uid = tokentable.UID
-			completed = 1
-			readonly = tokentable.Readonly
-			redisexptime := int(time.Now().Unix()) + viper.GetInt("token.expiretime")
-
-			//Write session into Redis
-			WriteTokenInRedis(token, uid, isadmin, completed, redisexptime, readonly)
-
 		} else {
 			SetErrorLog("No uid")
 			ans["error"] = "000011" // you are not authorised
