@@ -65,6 +65,13 @@ type ImpersonateTokens struct {
 	CreatedBy string `gorm:"column:createdby;type:varchar(254);DEFAULT '';"`
 }
 
+type Entrypoint struct {
+	gorm.Model
+	ID      string `gorm:"column:entrypointid;type:varchar(60);NOT NULL;"`
+	Status  int    `gorm:"column:status;type:double;DEFAULT 'false'"`
+	Version string `gorm:"column:version;type:varchar(254);UNIQUE;NOT NULL;"`
+}
+
 /*
 type Roles struct {
 	gorm.Model
@@ -175,6 +182,12 @@ func CheckDBStructure() {
 	if !db.Conn.Migrator().HasTable(&TimeHash{}) {
 		db.Conn.Set("gorm:table_options", "ENGINE=InnoDB;").Migrator().CreateTable(&TimeHash{})
 	}
+
+	//Create timehash table
+	if !db.Conn.Migrator().HasTable(&Entrypoint{}) {
+		db.Conn.Set("gorm:table_options", "ENGINE=InnoDB;").Migrator().CreateTable(&Entrypoint{})
+	}
+
 	/*
 		if !db.Conn.Migrator().HasTable(&Settings{}) {
 			//Create settings table
