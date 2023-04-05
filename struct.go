@@ -39,23 +39,8 @@ type ErrorMsg struct {
 	Message string `json:"message"`
 }
 
-// Error response struct
-type ErrorResponse struct {
-	Success   int                    `json:"success"`
-	Error     []ErrorMsg             `json:"error"`
-	Session   map[string]interface{} `json:"session"`
-	TimeStamp int                    `json:"timestamp"`
-	Language  string                 `json:"lang"`
-	/*
-		UID       string `json:"uid"`
-		IsAdmin   string `json:"isadmin"`
-		SesionExp int    `json:"sessionexp"`
-	*/
-}
-
 // Succsess response struct
-type SuccessResponse struct {
-	Success   int                    `json:"success"`
+type Response struct {
 	Data      map[string]interface{} `json:"data"`
 	Session   map[string]interface{} `json:"session"`
 	TimeStamp int                    `json:"timestamp"`
