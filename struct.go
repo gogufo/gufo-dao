@@ -66,3 +66,10 @@ type SuccessResponse struct {
 		SesionExp int    `json:"sessionexp"`
 	*/
 }
+
+type Response struct {
+	Data      map[string]interface{} `json:"data"`
+	Session   map[string]interface{} `json:"session"`
+	TimeStamp int                    `json:"timestamp"`
+	Language  string                 `json:"lang"`
+}
