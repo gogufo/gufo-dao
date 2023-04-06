@@ -46,6 +46,7 @@ func DBConnectv2() (*DBv2, error) {
 	host := viper.GetString("database.host")
 	port := viper.GetString("database.port")
 	charset := viper.GetString("database.charset")
+	sslmode := viper.GetString("database.sslmode")
 
 	var request string
 
@@ -58,7 +59,7 @@ func DBConnectv2() (*DBv2, error) {
 		DBConnectionv2.Conn = db
 		return DBConnectionv2, err
 	case "postgres":
-		request = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", host, port, user, dbname, pass)
+		request = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", host, port, user, dbname, pass, sslmode)
 		//	dsn := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
 		db, err := gorm.Open(postgres.Open(request), &gorm.Config{})
 		DBConnectionv2.Conn = db
