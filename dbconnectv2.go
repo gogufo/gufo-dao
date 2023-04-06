@@ -70,18 +70,17 @@ func DBConnectv2() (*DBv2, error) {
 
 }
 
-/*
 func DBCheck() bool {
-	_, err := DBConnect()
+	_, err := DBConnectv2()
 	//defer db.Close()
 	if err != nil {
-		SetErrorLog("dbconnect.go:65: " + err.Error())
+		SetErrorLog("dbconnectv2.go:77: " + err.Error())
 		return false
 	} else {
 		return true
 	}
 }
-*/
+
 // GetConnection - connect to DB
 func ConnectDBv2() (*DBv2, error) {
 	db, err := DBConnectv2()
