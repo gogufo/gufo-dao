@@ -21,7 +21,7 @@ type Request struct {
 	Param      string
 	ParamID    string
 	Action     string
-	Args       map[string]string `json:"args"`
+	Args       map[string]interface{} `json:"args"`
 	Token      string
 	TokenType  string
 	TimeStamp  int    `json:"timestamp"`
