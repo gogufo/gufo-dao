@@ -122,7 +122,7 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 
 			} else {
 
-				if tokentable.Status == 0 {
+				if !tokentable.Status {
 					SetErrorLog("No uid")
 					ans["error"] = "000011" // you are not authorised
 					return ans
@@ -135,18 +135,25 @@ func UpdateSession(sessionToken string) map[string]interface{} {
 				}
 
 				// Check Doues User is Admin in case of Token Admin Satatus
-				if tokentable.IsAdmin == 1 {
+				if tokentable.IsAdmin {
 					userExist := Users{}
 
 					db.Conn.Debug().Where(`uid = ?`, tokentable.UID).First(&userExist)
+					isadmin = 0
+					if userExist.IsAdmin {
+						isadmin = 1
+					}
 
-					isadmin = userExist.IsAdmin
 				}
 
 				exptime = tokentable.Expiration
 				uid = tokentable.UID
 				completed = 1
-				readonly = tokentable.Readonly
+				readonly = 0
+				if tokentable.Readonly {
+					readonly = 1
+				}
+
 				redisexptime := int(time.Now().Unix()) + viper.GetInt("token.expiretime")
 
 				//Write session into Redis
